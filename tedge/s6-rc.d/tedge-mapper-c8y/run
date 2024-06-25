@@ -1,0 +1,2 @@
+#!/command/with-contenv sh
+tedge-mapper c8y

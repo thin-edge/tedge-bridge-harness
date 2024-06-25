@@ -1,0 +1,3 @@
+- No waiting when attempting to reconnect
+- If JWT message doesn't start with an integer, the mapper panics
+- Doesn't use specified root_cert_path for all HTTP requests

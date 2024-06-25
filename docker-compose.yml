@@ -1,0 +1,27 @@
+services:
+  tedge-mosquitto:
+    image: eclipse-mosquitto
+    volumes:
+      - "./tedge/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+  fake-c8y:
+    build:
+      context: ./fake-c8y
+    volumes:
+      - "./certs:/certs"
+      - "./fake-c8y/mosquitto.conf:/mosquitto/config/mosquitto.conf"
+    environment:
+      - RUST_LOG=info
+  tedge:
+    build:
+      context: ./tedge
+    environment:
+      - TEDGE_DEVICE_CERT_PATH=/certs/device.crt
+      - TEDGE_DEVICE_KEY_PATH=/certs/device.key
+      - TEDGE_C8Y_URL=fake-c8y
+      - TEDGE_MQTT_CLIENT_HOST=tedge-mosquitto
+      - TEDGE_MQTT_CLIENT_PORT=1883
+      - TEDGE_MQTT_BRIDGE_BUILT_IN=true
+      - TEDGE_MQTT_BRIDGE_RECONNECT_POLICY_INITIAL_INTERVAL=0s
+    volumes:
+      - "./certs:/certs"
+    command: sh -c 'cat /certs/ca.crt | sudo tee -a /etc/ssl/certs/ca-certificates.crt && tedge-mapper c8y'
